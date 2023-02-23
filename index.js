@@ -39,14 +39,39 @@ const typeDefs = `#graphql
     user:User!,
     participants:[Participant!],
   }
-
-  input CreateUserInput {
-  data:{
-  
+  type DeleteAllOutput{
+    count:Int!,
+  }
+  input CreateUserInput { 
+    username: String!,
+    email: String,   
+  }
+  input UpdateUserInput{
+    id: ID!,
     username: String!,
     email: String,
   }
+  input DeleteUserInput{
+    id:ID!,
   }
+  input CreateLocationInput{
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+  }
+  input UpdateLocationInput{
+    id: ID!,
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+  }
+  input DeleteLocationInput{
+    id:ID!,
+  }
+
+
 
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
@@ -70,26 +95,90 @@ const typeDefs = `#graphql
   type Mutation{
     
     createUser(data:CreateUserInput!):User!
+    updateUser(data:UpdateUserInput!):User!
+    deleteUser(data:DeleteUserInput!):User!
+    deleteAllUsers:DeleteAllOutput!
 
+    createLocation(data:CreateLocationInput!):Location!
+    updateLocation(data:UpdateLocationInput!):Location!
+    deleteLocation(data:DeleteLocationInput!):Location!
+    deleteAllLocations:DeleteAllOutput!
 
   }
 `;
 
 
-
 const resolvers = {
+  
   Mutation: {
+
+    //USER
+
     createUser: (parent, {data}) => {
       const user = {
         id: nanoid(),
-        username:data.username,
-        email:data.email
+        ...data
       }
-
       users.push(user)
-
       return user
     },
+    updateUser: (parent, { data: { username, email, id } }) => {
+      const updatedUserIndex = users.findIndex(us => String(us.id) === (id))
+      if (updatedUserIndex===-1) {
+        throw new Error("User not found!")
+      }
+      const updatedUser = users[updatedUserIndex] =    { ...users[updatedUserIndex], username, email } 
+      return updatedUser
+    },
+    deleteUser: (parent, { data: { id } }) => {
+      const deletedUserIndex = users.findIndex(us => String(us.id) === id)
+      if (deletedUserIndex===-1) {
+        throw new Error("User not found!")
+      }
+      const deletedUser = users[deletedUserIndex]
+      users.splice(deletedUserIndex, 1)
+      return deletedUser
+    },
+    deleteAllUsers: () => {
+      const length = users.length
+      users.splice(0, length)
+      return {count:length}
+    },
+
+    //LOCATION
+
+    createLocation:(parent, { data }) => {
+      const location = {
+      id: nanoid(),
+      ...data
+      }
+      locations.push(location)
+      return location
+    },
+    updateLocation: (parent, { data: { name, desc, lat,lng,id } }) => {
+      const updatedLocationIndex = locations.findIndex(loc => String(loc.id) === (id))
+      if (updatedLocationIndex===-1) {
+        throw new Error("Location not found!")
+      }
+      const updatedLocation = locations[updatedLocationIndex] =    { ...locations[updatedLocationIndex],  name, desc, lat,lng } 
+      return updatedLocation
+    },
+    deleteLocation: (parent, { data: { id } }) => {
+      const deletedLocationIndex = locations.findIndex(loc => String(loc.id) === id)
+      if (deletedLocationIndex===-1) {
+        throw new Error("Location not found!")
+      }
+      const deletedLocation = locations[deletedLocationIndex]
+      locations.splice(deletedLocationIndex, 1)
+      return deletedLocation
+    },
+    deleteAllLocations: () => {
+      const length = locations.length
+      locations.splice(0, length)
+      return {count:length}
+    },
+
+
   },
 
   Query: {
