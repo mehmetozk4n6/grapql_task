@@ -1,13 +1,31 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { events, locations, participants, users } from './data.js';
-
-// Odev1 tamamlandı
+import { nanoid } from 'nanoid'
 
 const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
   # This "Book" type defines the queryable fields for every book in our data source.
+  type Location {   
+    id: ID!,
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+  }
+  type Participant {   
+    id: ID!,
+    user_id: ID!,
+    event_id: ID!,
+    username:String!,
+  }
+  type User {   
+    id: ID!,
+    username: String!,
+    email: String,
+    events:[Event!],
+  }
   type Event {   
     id: ID!,
     title: String!,
@@ -21,24 +39,13 @@ const typeDefs = `#graphql
     user:User!,
     participants:[Participant!],
   }
-  type Location {   
-    id: ID!,
-    name: String!,
-    desc: String,
-    lat:Float!,
-    lng:Float!,
-  }
-  type User {   
-    id: ID!,
+
+  input CreateUserInput {
+  data:{
+  
     username: String!,
     email: String,
-    events:[Event!],
   }
-  type Participant {   
-    id: ID!,
-    user_id: ID!,
-    event_id: ID!,
-    username:String!,
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -59,9 +66,32 @@ const typeDefs = `#graphql
     participant(id:ID!):Participant,
 
   }
+
+  type Mutation{
+    
+    createUser(data:CreateUserInput!):User!
+
+
+  }
 `;
 
+
+
 const resolvers = {
+  Mutation: {
+    createUser: (parent, {data}) => {
+      const user = {
+        id: nanoid(),
+        username:data.username,
+        email:data.email
+      }
+
+      users.push(user)
+
+      return user
+    },
+  },
+
   Query: {
     events: () => events,
     event: (parent, args) =>
