@@ -1,0 +1,141 @@
+type Location {   
+    id: ID!,
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+}
+type Participant {   
+    id: ID!,
+    user_id: ID,
+    event_id: ID,
+    username:String
+}
+type User {   
+    id: ID!,
+    username: String!,
+    email: String,
+    events:[Event!],
+}
+type Event {   
+    id: ID!,
+    title: String!,
+    desc: String,
+    date: String,
+    from: String,
+    to: String!,
+    location_id: ID,
+    location:Location,
+    user_id: ID,
+    user:User,
+    participants:[Participant!],
+}
+type DeleteAllOutput{
+    count:Int!,
+}
+input CreateUserInput { 
+    username: String!,
+    email: String,   
+}
+input UpdateUserInput{
+    id: ID!,
+    username: String!,
+    email: String,
+}
+input DeleteUserInput{
+    id:ID!,
+}
+input CreateLocationInput{
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+}
+input UpdateLocationInput{
+    id: ID!,
+    name: String!,
+    desc: String,
+    lat:Float!,
+    lng:Float!,
+}
+input DeleteLocationInput{
+    id:ID!,
+}
+input CreateEventInput{
+    title: String!,
+    desc: String,
+    date: String,
+    from: String,
+    to: String,
+    location_id: ID,
+    user_id: ID,
+}
+input UpdateEventInput{
+    id: ID!,
+    title: String!,
+    desc: String,
+    date: String,
+    from: String,
+    to: String,
+    location_id: ID,
+    user_id: ID,
+}
+input DeleteEventInput{
+    id:ID!,
+}
+input CreateParticipantInput{
+    user_id: ID,
+    event_id: ID,
+}
+input UpdateParticipantInput{
+    id: ID!,
+    user_id: ID,
+    event_id: ID,
+}
+input DeleteParticipantInput{
+    id:ID!,
+}
+
+
+# The "Query" type is special: it lists all of the available queries that
+# clients can execute, along with the return type for each. In this
+# case, the "books" query returns an array of zero or more Books (defined above).
+type Query {
+
+    events: [Event!]!,
+    event(id:ID!):Event,
+
+    locations: [Location!]!,
+    location(id:ID!):Location!,
+
+    users: [User!]!,
+    user(id:ID!):User,
+
+    participants: [Participant!]!,
+    participant(id:ID!):Participant,
+
+}
+
+type Mutation{
+    
+    createUser(data:CreateUserInput!):User!
+    updateUser(data:UpdateUserInput!):User!
+    deleteUser(data:DeleteUserInput!):User!
+    deleteAllUsers:DeleteAllOutput!
+
+    createLocation(data:CreateLocationInput!):Location!
+    updateLocation(data:UpdateLocationInput!):Location!
+    deleteLocation(data:DeleteLocationInput!):Location!
+    deleteAllLocations:DeleteAllOutput!
+
+    createEvent(data:CreateEventInput!):Event!
+    updateEvent(data:UpdateEventInput!):Event!
+    deleteEvent(data:DeleteEventInput!):Event!
+    deleteAllEvents:DeleteAllOutput!
+
+    createParticipant(data:CreateParticipantInput!):Participant!
+    updateParticipant(data:UpdateParticipantInput!):Participant!
+    deleteParticipant(data:DeleteParticipantInput!):Participant!
+    deleteAllParticipants:DeleteAllOutput!
+
+}
