@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 
 
 
-const pubSub = createPubSub()
+ const pubSub = createPubSub()
 
 // Provide your schema
 const yoga = createYoga({
@@ -151,6 +151,10 @@ const yoga = createYoga({
       deleteParticipant(data:DeleteParticipantInput!):Participant!
       deleteAllParticipants:DeleteAllOutput!
 
+    }
+
+    type Subscription {
+      countdown(from: Int!): Int!
     }
     `,
     resolvers: {
@@ -305,6 +309,7 @@ const yoga = createYoga({
         participant: (parent, args) =>
           participants.find((participant) => participant.id === Number(args.id)),
       },
+      
 
       User: {
         events: (parent, args) =>
@@ -323,17 +328,17 @@ const yoga = createYoga({
         username: (parent, args) => users.find((use) => String(use.id )=== String(parent.user_id))?.username
       },
 
-      // Subscription: {
-      //   countdown: {
-      //     // This will return the value on every 1 sec until it reaches 0
-      //     subscribe: async function* (_, { from }) {
-      //       for (let i = from; i >= 0; i--) {
-      //         await new Promise((resolve) => setTimeout(resolve, 1000))
-      //         yield { countdown: i }
-      //       }
-      //     }
-      //   }
-      // }
+      Subscription: {
+        countdown: {
+          // This will return the value on every 1 sec until it reaches 0
+          subscribe: async function* (_, { from }) {
+            for (let i = from; i >= 0; i--) {
+              await new Promise((resolve) => setTimeout(resolve, 1000))
+              yield { countdown: i }
+            }
+          }
+        }
+      }
     },
   })
 })
